@@ -31,23 +31,6 @@ module.exports.loop = function () {
     log.debug('End Loop');
 };
 
-Spawn.prototype.gatherEnergy = function () {
-
-    for (var i in Game.creeps) {
-        console.log(Game.creeps[i]);
-    }
-
-    if (this.memory.state == STATES.BUILD_ENERGY_WORKER && this.spawning != null)
-        return;
-
-
-    if (this.memory.energyRoutes.length == 0) {
-        this.addNewEnergyRoute();
-    }
-
-    this.buildWorkerForEnergyRoute();
-};
-
 Spawn.prototype.addNewEnergyRoute = function () {
     var source = this.pos.findClosestByPath(FIND_SOURCES);
     console.log(source);
@@ -90,9 +73,17 @@ function initialize(spawn) {
     util.setNewMemory(spawn, 'state', STATES.BUILD_ENERGY_WORKER);
     util.setNewMemory(spawn, 'stateTickCount', 0);
     // energy routes is sourceId -> [workerIds]
-    util.setNewMemory(spawn, 'energyRoutes', []);
     util.setNewMemory(spawn, 'assignedCreeps', 0);
     util.setNewMemory(spawn, 'unassignedCreeps', []);
+
+    util.setNewMemory(spawn, 'energyRoutes', []);
+
+    var spawnPos = spawn.pos;
+    for (var i in spawn.room.find(FIND_SOURCES)) {
+        var dist = spawnPos.findPathTo(i).opts.length;
+        spawn.memory.energyRoutes[dist] = i;
+    }
+
     return spawn;
 }
 
@@ -101,7 +92,7 @@ function assignCreep(spawn, creep) {
 
         case creepUtil.jobs.HARVESTER:
 
-            if (assignCreepToAvailableRoute(creep, spawn.memory.energyRoutes))
+            if (assignCreepToEnergy(creep, spawn.memory.energyRoutes))
                 break;
 
             break;
@@ -112,7 +103,7 @@ function assignCreep(spawn, creep) {
 }
 
 // return false if cannot be assigned.
-function assignCreepToAvailableRoute(creep, routes) {
+function assignCreepToEnergy(creep, routes) {
     if (routes.length > 0) {
         log.warn('No available source to harvest.');
         return false;
