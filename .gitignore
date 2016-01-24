@@ -1,5 +1,7 @@
 Gruntfile.js
 
+.idea
+
 # Logs
 logs
 *.log

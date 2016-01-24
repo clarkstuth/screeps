@@ -6,6 +6,8 @@
  * var mod = require('CreepUtil'); // -> 'a thing'
  */
 
+var log = require('Logger').createLogger('CreepUtil');
+
 // edit
 module.exports.jobs = {
     HARVESTER: 'harvester'
@@ -14,7 +16,9 @@ module.exports.jobs = {
 module.exports.HARVESTER_ARGS = [MOVE, WORK, CARRY];
 
 module.exports.loop = function() {
+    log.debug('Start Loop');
     Game.creeps.act();
+    log.debug('End Loop');
 }
 
 module.exports.create = function(spawn, args, name, job) {

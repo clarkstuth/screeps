@@ -8,44 +8,34 @@
 var util = require('Util');
 var creepUtil = require('CreepUtil');
 
-var goals = {
+var log = require('Logger').createLogger('SpawnUtil');
+
+var GOALS = {
     GATHER_ENERGY: "gather energy"
 };
 
-var states = {
+var STATES = {
     BUILD_ENERGY_WORKER: "build energy worker"
 };
 
-Spawn.prototype.initialize = function() {
-    util.setNewMemory(this, 'goal', goals.GATHER_ENERGY);
-    util.setNewMemory(this, 'state', states.BUILD_ENERGY_WORKER);
-    util.setNewMemory(this, 'stateTickCount', 0);
-    // energy routes is sourceId -> [workerIds]
-    util.setNewMemory(this, 'energyRoutes', []);
-    util.setNewMemory(this, 'assignedCreeps', 0);
-    util.setNewMemory(this, 'unassignedCreeps', []);
-    return this;
-};
+module.exports.loop = function() {
 
-Spawn.prototype.determineState = function() {
-    return this.initialize();
-};
+    log.debug('Start Loop');
 
-Spawn.prototype.gatherEnergy = function() {
+    for (var spawn in Game.spawns) {
+        spawn = Game.spawns[spawn];
 
-    for (var i in Game.creeps) {
-        console.log(Game.creeps[i]);
+        spawn.determineNextAction();
+        spawn.assignUnassignedCreeps();
+        spawn.act();
     }
 
-    if (this.memory.state == states.BUILD_ENERGY_WORKER && this.spawning != null)
-        return;
+    log.debug('End Loop');
+};
 
 
-    if (this.memory.energyRoutes.length == 0) {
-        this.addNewEnergyRoute();
-    }
-
-    this.buildWorkerForEnergyRoute();
+Spawn.prototype.determineNextAction = function() {
+    initialize(this);
 };
 
 Spawn.prototype.assignUnassignedCreeps = function() {
@@ -80,6 +70,34 @@ Spawn.prototype.assignUnassignedCreeps = function() {
     }
 };
 
+function initialize(spawn) {
+    util.setNewMemory(spawn, 'goal', GOALS.GATHER_ENERGY);
+    util.setNewMemory(spawn, 'state', STATES.BUILD_ENERGY_WORKER);
+    util.setNewMemory(spawn, 'stateTickCount', 0);
+    // energy routes is sourceId -> [workerIds]
+    util.setNewMemory(spawn, 'energyRoutes', []);
+    util.setNewMemory(spawn, 'assignedCreeps', 0);
+    util.setNewMemory(spawn, 'unassignedCreeps', []);
+    return spawn;
+}
+
+Spawn.prototype.gatherEnergy = function() {
+
+    for (var i in Game.creeps) {
+        console.log(Game.creeps[i]);
+    }
+
+    if (this.memory.state == STATES.BUILD_ENERGY_WORKER && this.spawning != null)
+        return;
+
+
+    if (this.memory.energyRoutes.length == 0) {
+        this.addNewEnergyRoute();
+    }
+
+    this.buildWorkerForEnergyRoute();
+};
+
 Spawn.prototype.buildWorkerForEnergyRoute = function() {
     var name = this.name + 'Harvester' + this.memory.energyRoutes.reduce(function(prev, curr, index, array) {
             return pref + curr.length();
@@ -104,7 +122,7 @@ Spawn.prototype.act = function() {
     this.memory.stateTickCount++;
 
     switch (this.memory.state) {
-        case states.BUILD_ENERGY_WORKER:
+        case STATES.BUILD_ENERGY_WORKER:
             this.gatherEnergy();
             break;
 
