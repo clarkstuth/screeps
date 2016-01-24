@@ -56,8 +56,15 @@ Creep.prototype.harvest = function() {
 
 module.exports.create = function(spawn, args, name, job) {
     var memory = {'job': job, 'spawnId': spawn.id};
-    log.debug('Creating new creep. ' + memory);
-    return spawn.createCreep(args, name, memory);
+    log.debug('Creating new creep ' + name + '[' + args + '] - ' + JSON.stringify(memory));
+
+    var err = spawn.createCreep(args, name, memory);
+    if (err == OK) {
+        return true;
+    }
+
+    log.warn(spawn.name + ' could not create ' + name + '.  Error: ' + err);
+    return false;
 };
 
 Creep.prototype.assignSource = function(source) {
