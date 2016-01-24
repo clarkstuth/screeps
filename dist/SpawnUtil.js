@@ -18,7 +18,7 @@ var STATES = {
     BUILD_ENERGY_WORKER: "build energy worker"
 };
 
-module.exports.loop = function() {
+module.exports.loop = function () {
 
     log.debug('Start Loop');
 
@@ -34,40 +34,25 @@ module.exports.loop = function() {
 };
 
 
-Spawn.prototype.determineNextAction = function() {
+Spawn.prototype.determineNextAction = function () {
+    log.debug(this.name + ' determining next action.');
     initialize(this);
 };
 
-Spawn.prototype.assignUnassignedCreeps = function() {
+Spawn.prototype.assignUnassignedCreeps = function () {
+
+    log.debug(this.name + ' assigning unassigned creeps.');
 
     while (this.memory.unassignedCreeps.length > 0) {
         var creepName = this.memory.unassignedCreeps.pop();
 
+        log.debug('assigning ' + creepName);
         var creep = Game.creeps[creepName];
 
-        switch (creep.memory.job) {
-            case creepUtil.jobs.HARVESTER:
-                var sourceId;
-
-                console.log('<<< creep');
-
-                for (var i in this.memory.energyRoutes) {
-                    if (sourceId == null || this.memory.energyRoutes[i].length < this.memory.energyRoutes[sourceId].length) {
-                        sourceId = i;
-                    }
-                    break;
-                }
-
-                console.log(sourceId);
-
-                creep.assignSource(Game.getObjectById(sourceId))
-                this.memory.assignedCreeps++;
-
-                break;
-            default:
-                return;
-        }
+        assignCreep(this, creep);
     }
+
+    log.debug(this.name + ' no more creeps to assign.');
 };
 
 function initialize(spawn) {
@@ -81,7 +66,43 @@ function initialize(spawn) {
     return spawn;
 }
 
-Spawn.prototype.gatherEnergy = function() {
+function assignCreep(spawn, creep) {
+    log.debug('creep is ' + creep.memory.job);
+    switch (creep.memory.job) {
+
+        case creepUtil.jobs.HARVESTER:
+
+            if (assignCreepToAvailableRoute(creep, spawn.memory.energyRoutes))
+                break;
+
+            break;
+        default:
+            log.warn('No job assigned for ' + creep.name);
+            return;
+    }
+}
+
+// return false if cannot be assigned.
+function assignCreepToAvailableRoute(creep, routes) {
+    if (this.memory.energyRoutes.length > 0) {
+        log.warn('No available source to harvest.');
+        return false;
+    }
+
+    // sourceId of harvest route with lowest number of workers
+    var sourceId = null;
+    for (var i in routes) {
+        if (sourceId == null || routes[i].length < routes[sourceId].length) {
+            sourceId = i;
+        }
+    }
+
+    log.debug('Assign ' + creep.name + ' to source: ' + sourceId);
+    creep.assignSource(sourceId);
+    this.memory.assignedCreeps++;
+}
+
+Spawn.prototype.gatherEnergy = function () {
 
     for (var i in Game.creeps) {
         console.log(Game.creeps[i]);
@@ -98,8 +119,8 @@ Spawn.prototype.gatherEnergy = function() {
     this.buildWorkerForEnergyRoute();
 };
 
-Spawn.prototype.buildWorkerForEnergyRoute = function() {
-    var name = this.name + 'Harvester' + this.memory.energyRoutes.reduce(function(prev, curr, index, array) {
+Spawn.prototype.buildWorkerForEnergyRoute = function () {
+    var name = this.name + 'Harvester' + this.memory.energyRoutes.reduce(function (prev, curr, index, array) {
             return pref + curr.length();
         }, 0);
 
@@ -111,14 +132,14 @@ Spawn.prototype.buildWorkerForEnergyRoute = function() {
     // creep.assignSource(source);
 };
 
-Spawn.prototype.addNewEnergyRoute = function() {
+Spawn.prototype.addNewEnergyRoute = function () {
     var source = this.pos.findClosestByPath(FIND_SOURCES);
     console.log(source);
     this.memory.energyRoutes[source.id] = [];
     return source;
 };
 
-Spawn.prototype.act = function() {
+Spawn.prototype.act = function () {
     this.memory.stateTickCount++;
 
     switch (this.memory.state) {

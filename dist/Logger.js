@@ -11,7 +11,7 @@ var SEVERITY = {
 Logger.prototype.severities = SEVERITY;
 
 Logger.prototype.logWithSeverity = function (severity, message) {
-    console.log('[' + name + '] [' + severity + ']  ' + message);
+    console.log('[' + this.name + '] [' + severity + ']  ' + message);
 };
 
 Logger.prototype.info = function (message) {

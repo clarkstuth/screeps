@@ -7,5 +7,8 @@ module.exports.loop = function () {
 
     log.debug('Start');
 
+    spawnUtil.loop();
+    creepUtil.loop();
+
     log.debug('End');
 };
