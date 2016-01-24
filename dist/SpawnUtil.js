@@ -7,6 +7,7 @@
  */
 var util = require('Util');
 var creepUtil = require('CreepUtil');
+var energyRoute = require('EnergyRoute');
 
 var log = require('Logger').createLogger('SpawnUtil');
 
@@ -42,9 +43,9 @@ Spawn.prototype.act = function () {
     log.debug(this.name + ' acting');
     this.memory.stateTickCount++;
 
-    determineNextAction(spawn);
-    assignUnassignedCreeps(spawn);
-    determineConstruction(spawn);
+    determineNextAction(this);
+    assignUnassignedCreeps(this);
+    determineConstruction(this);
 
 };
 
@@ -76,12 +77,15 @@ function initialize(spawn) {
     util.setNewMemory(spawn, 'assignedCreeps', 0);
     util.setNewMemory(spawn, 'unassignedCreeps', []);
 
-    util.setNewMemory(spawn, 'energyRoutes', []);
+    if (util.setNewMemory(spawn, 'energyRoutes', [])) {
+        log.debug(spawn.name + ' initializing energy routes');
+        var spawnPos = spawn.pos;
 
-    var spawnPos = spawn.pos;
-    for (var i in spawn.room.find(FIND_SOURCES)) {
-        var dist = spawnPos.findPathTo(i).opts.length;
-        spawn.memory.energyRoutes[dist] = i;
+        var sources = spawn.room.find(FIND_SOURCES);
+        for (var i in sources) {
+            var dist = spawnPos.findPathTo(sources[i]).length;
+            spawn.memory.energyRoutes[dist] = new EnergyRoute(sources[i].id, []);
+        }
     }
 
     return spawn;
@@ -138,12 +142,12 @@ function determineConstruction(spawn) {
 
 function buildEnergyWorker(spawn) {
     var name = spawn.name + 'Harvester' + spawn.memory.energyRoutes.reduce(function (prev, curr, index, array) {
-            return pref + curr.length();
+            return prev + curr.workers.length;
         }, 0);
 
     console.log(spawn.name + ' creating ' + name);
 
-    var creep = creepUtil.create(this, creepUtil.args.HARVESTER_ARGS, name, creepUtil.jobs.HARVESTER);
+    var creep = creepUtil.create(spawn, creepUtil.args.HARVESTER_ARGS, name, creepUtil.jobs.HARVESTER);
     this.memory.unassignedCreeps.push(creep);
     return true;
 }

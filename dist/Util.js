@@ -5,7 +5,10 @@
  * You can import it from another modules like this:
  * var mod = require('Util'); // -> 'a thing'
  */
-module.exports.setNewMemory = function(object, key, value) {
-    if (object.memory[key] == null)
+module.exports.setNewMemory = function (object, key, value) {
+    if (object.memory[key] == null) {
         object.memory[key] = value;
+        return true;
+    }
+    return false;
 };
