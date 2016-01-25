@@ -63,7 +63,7 @@ module.exports.create = function(spawn, args, name, job) {
         return true;
     }
 
-    log.warn(spawn.name + ' could not create ' + name + '.  Error: ' + err);
+    log.warn(spawn.name + ' could not create ' + name + '.  Error: ' + nameOrError);
     return false;
 };
 

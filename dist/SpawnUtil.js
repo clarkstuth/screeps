@@ -139,15 +139,16 @@ function determineConstruction(spawn) {
 }
 
 function buildEnergyWorker(spawn) {
+    console.log(spawn.name + ' building energy worker.');
+
     var name = spawn.name + 'Harvester' + spawn.memory.energyRoutes.reduce(function (prev, curr, index, array) {
-            log.debug('prev: ' + JSON.stringify(prev));
-            log.debug('curr: ' + + JSON.stringify(curr));
-            return prev + curr.workers.length;
+            return curr == null ? prev : prev + curr;
         }, 0);
 
-    console.log(spawn.name + ' creating ' + name);
+    if (creepUtil.create(spawn, creepUtil.args.HARVESTER_ARGS, name, creepUtil.jobs.HARVESTER)) {
+        spawn.memory.unassignedCreeps.push(name);
+        return true;
+    }
 
-    var creep = creepUtil.create(spawn, creepUtil.args.HARVESTER_ARGS, name, creepUtil.jobs.HARVESTER);
-    spawn.memory.unassignedCreeps.push(name);
-    return true;
+    return false;
 }
