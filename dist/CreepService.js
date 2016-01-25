@@ -1,5 +1,4 @@
-var creepArgs = require('CreepArgs');
-var util = require('Util');
+var log = require('Logger').createLogger('CreepService');
 
 /**
  * Gets a new creep, performing any necessary setup.
@@ -19,11 +18,11 @@ module.exports.get = function(name) {
  * @returns {boolean} true on success, false on failure
  */
 module.exports.create = function(spawn, args, name, job) {
-    var defaultMemory = {job: job,  spawnId: spawn.id, action: null, actionTime: 0};
-    log.debug('Creating new creep ' + name + '[' + args + '] - ' + JSON.stringify(memory));
+    var defaultMemory = {job: job,  spawnId: spawn.id, action: null, actionTime: 0, interrupted: false};
+    log.debug('Creating new creep ' + name + '[' + args + '] - ' + JSON.stringify(defaultMemory));
 
     // todo - spawn service
-    var nameOrError = spawn.createCreep(args, name, memory);
+    var nameOrError = spawn.createCreep(args, name, defaultMemory);
     if (nameOrError == name) {
         return true;
     }

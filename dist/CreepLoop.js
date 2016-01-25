@@ -7,6 +7,7 @@ module.exports.loop = function() {
 
     for (var name in Game.creeps) {
         var creep = service.get(name);
+        creep.determineAction();
         creep.act();
     }
 

@@ -6,7 +6,7 @@ var creepActions = require('CreepActions');
 /**
  * Creep performs standard action.
  */
-Creep.prototype.act = function() {
+Creep.prototype.act = function () {
     log.debug(this.name + ' Acting');
 
     switch (this.memory.action) {
@@ -17,11 +17,24 @@ Creep.prototype.act = function() {
         default:
             log.warn(this.name - ' No action performed');
     }
-
-    this.harvestAction();
 };
 
-Creep.prototype.setSource = function(sourceId, routes) {
+Creep.prototype.setSource = function (sourceId, routes) {
     this.memory.sourceId = sourceId;
     log.debug(this.name + ' harvesting from source: ' + this.memory.sourceId);
+};
+
+Creep.prototype.determineAction = function () {
+
+    switch (this.memory.job) {
+
+        case creepArgs.jobs.HARVESTER:
+            if (this.memory.action == null)
+                this.memory.action = creepArgs.actions.HARVEST_ACTION;
+            break;
+
+        default:
+            log.error(this.name + " no job assigned.");
+    }
+
 };
