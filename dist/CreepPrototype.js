@@ -11,7 +11,7 @@ Creep.prototype.act = function () {
 
     switch (this.memory.action) {
         case creepArgs.actions.HARVEST_ACTION:
-            creepActions.harvestAction(creep);
+            creepActions.harvestAction(this);
             break;
 
         default:
