@@ -71,5 +71,4 @@ Creep.prototype.assignSource = function(sourceId, routes) {
     var spawn = Game.getObjectById(this.memory.spawnId);
     this.memory.sourceId = sourceId;
     log.debug(this.name + ' harvesting between source: ' + this.memory.sourceId + ' and spawn: ' + spawn.name);
-    routes[sourceId].push(this.name);
 };

@@ -114,14 +114,18 @@ function assignCreepToEnergy(creep, routes) {
 
     // sourceId of harvest route with lowest number of workers
     var sourceId = null;
+    var sourceIndex = null;
     routes.forEach(function (element, index) {
-        if (element != null && (sourceId == null || element.workers.length < routes[sourceId].length)) {
-            sourceId = index;
+        if (element != null && (sourceId == null || element.workers.length < routes[index].length)) {
+            sourceId = element.id;
+            sourceIndex = index;
         }
     });
 
-    log.debug('Assign ' + creep.name + ' to source: ' + routes[sourceId].id);
+    log.debug('Assign ' + creep.name + ' to source: ' + routes[sourceIndex].id);
     creep.assignSource(sourceId, routes);
+
+    routes[sourceIndex].workers.push(creep.name);
 }
 
 function determineConstruction(spawn) {
