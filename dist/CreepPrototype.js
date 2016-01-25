@@ -19,7 +19,7 @@ Creep.prototype.act = function () {
     }
 };
 
-Creep.prototype.setSource = function (sourceId, routes) {
+Creep.prototype.setSource = function (sourceId) {
     this.memory.sourceId = sourceId;
     log.debug(this.name + ' harvesting from source: ' + this.memory.sourceId);
 };
