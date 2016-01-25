@@ -121,7 +121,7 @@ function assignCreepToEnergy(creep, routes) {
     });
 
     log.debug('Assign ' + creep.name + ' to source: ' + routes[sourceId].id);
-    creep.assignSource(routes[sourceId]);
+    creep.assignSource(sourceId, routes);
 }
 
 function determineConstruction(spawn) {
@@ -142,7 +142,7 @@ function buildEnergyWorker(spawn) {
     console.log(spawn.name + ' building energy worker.');
 
     var name = spawn.name + 'Harvester' + spawn.memory.energyRoutes.reduce(function (prev, curr, index, array) {
-            return curr == null ? prev : prev + curr;
+            return curr == null ? prev : prev + curr.workers.length;
         }, 0);
 
     if (creepUtil.create(spawn, creepUtil.args.HARVESTER_ARGS, name, creepUtil.jobs.HARVESTER)) {

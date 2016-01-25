@@ -67,8 +67,9 @@ module.exports.create = function(spawn, args, name, job) {
     return false;
 };
 
-Creep.prototype.assignSource = function(source) {
+Creep.prototype.assignSource = function(sourceId, routes) {
     var spawn = Game.getObjectById(this.memory.spawnId);
+    this.memory.sourceId = sourceId;
     log.debug(this.name + ' harvesting between source: ' + this.memory.sourceId + ' and spawn: ' + spawn.name);
-    this.memory.sourceId = source.id;
+    routes[sourceId].push(this.name);
 };
