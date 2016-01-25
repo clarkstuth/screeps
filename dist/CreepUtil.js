@@ -38,6 +38,7 @@ Creep.prototype.harvest = function() {
     log.debug(this.name + ' Harvesting');
     var spawn = Game.getObjectById(this.memory.spawnId);
     var source = Game.getObjectById(this.memory.sourceId);
+    this.asdf();
 
     if (this.carry.energy == this.carryCapacity) {
         if (this.transfer(spawn, RESOURCE_ENERGY) != OK) {
@@ -58,8 +59,8 @@ module.exports.create = function(spawn, args, name, job) {
     var memory = {'job': job, 'spawnId': spawn.id};
     log.debug('Creating new creep ' + name + '[' + args + '] - ' + JSON.stringify(memory));
 
-    var err = spawn.createCreep(args, name, memory);
-    if (err == OK) {
+    var nameOrError = spawn.createCreep(args, name, memory);
+    if (nameOrError == name) {
         return true;
     }
 

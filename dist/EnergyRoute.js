@@ -1,8 +1,3 @@
-function EnergyRoute(id, workers) {
-    this.id = id;
-    this.workers = [];
-}
-
-EnergyRoute.prototype.isRouteSaturated = function() {
-
+module.exports.create = function(id) {
+    return {id: id, workers: []};
 };

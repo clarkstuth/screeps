@@ -84,7 +84,7 @@ function initialize(spawn) {
         var sources = spawn.room.find(FIND_SOURCES);
         for (var i in sources) {
             var dist = spawnPos.findPathTo(sources[i]).length;
-            spawn.memory.energyRoutes[dist] = new EnergyRoute(sources[i].id, []);
+            spawn.memory.energyRoutes[dist] = new energyRoute.create(sources[i].id);
         }
     }
 
@@ -108,18 +108,29 @@ function assignCreep(spawn, creep) {
 
 // return false if cannot be assigned.
 function assignCreepToEnergy(creep, routes) {
-    if (routes.length > 0) {
+    if (routes.length <= 0) {
         log.warn('No available source to harvest.');
         return false;
     }
 
     // sourceId of harvest route with lowest number of workers
     var sourceId = null;
-    for (var i in routes) {
-        if (sourceId == null || routes[i].length < routes[sourceId].length) {
-            sourceId = i;
+    routes.forEach(function(element, index) {
+        log.debug(index);
+        log.debug(element == null ? element : element.toString());
+        if (element != null && (sourceId == null || routes[i].workers.length < routes[sourceId].length)) {
+            sourceId = element.id;
         }
-    }
+    });
+
+    //for (var i in routes) {
+    //    log.debug(i);
+    //
+    //    if (sourceId == null || routes[sourceId] == null ||
+    //        routes[i].workers.length < routes[sourceId].length) {
+    //        sourceId = i;
+    //    }
+    //}
 
     log.debug('Assign ' + creep.name + ' to source: ' + sourceId);
     creep.assignSource(sourceId);
@@ -148,6 +159,6 @@ function buildEnergyWorker(spawn) {
     console.log(spawn.name + ' creating ' + name);
 
     var creep = creepUtil.create(spawn, creepUtil.args.HARVESTER_ARGS, name, creepUtil.jobs.HARVESTER);
-    this.memory.unassignedCreeps.push(creep);
+    spawn.memory.unassignedCreeps.push(name);
     return true;
 }
