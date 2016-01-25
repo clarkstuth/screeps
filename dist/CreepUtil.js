@@ -31,14 +31,13 @@ module.exports.loop = function() {
 
 Creep.prototype.act = function() {
     log.debug(this.name + ' Acting');
-    this.harvest();
+    this.harvestAction();
 };
 
-Creep.prototype.harvest = function() {
+Creep.prototype.harvestAction = function() {
     log.debug(this.name + ' Harvesting');
     var spawn = Game.getObjectById(this.memory.spawnId);
     var source = Game.getObjectById(this.memory.sourceId);
-    this.asdf();
 
     if (this.carry.energy == this.carryCapacity) {
         if (this.transfer(spawn, RESOURCE_ENERGY) != OK) {

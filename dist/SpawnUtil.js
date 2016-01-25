@@ -74,7 +74,6 @@ function initialize(spawn) {
     util.setNewMemory(spawn, 'state', STATES.BUILD_ENERGY_WORKER);
     util.setNewMemory(spawn, 'stateTickCount', 0);
     // energy routes is sourceId -> [workerIds]
-    util.setNewMemory(spawn, 'assignedCreeps', 0);
     util.setNewMemory(spawn, 'unassignedCreeps', []);
 
     if (util.setNewMemory(spawn, 'energyRoutes', [])) {
@@ -115,26 +114,14 @@ function assignCreepToEnergy(creep, routes) {
 
     // sourceId of harvest route with lowest number of workers
     var sourceId = null;
-    routes.forEach(function(element, index) {
-        log.debug(index);
-        log.debug(element == null ? element : element.toString());
-        if (element != null && (sourceId == null || routes[i].workers.length < routes[sourceId].length)) {
-            sourceId = element.id;
+    routes.forEach(function (element, index) {
+        if (element != null && (sourceId == null || element.workers.length < routes[sourceId].length)) {
+            sourceId = index;
         }
     });
 
-    //for (var i in routes) {
-    //    log.debug(i);
-    //
-    //    if (sourceId == null || routes[sourceId] == null ||
-    //        routes[i].workers.length < routes[sourceId].length) {
-    //        sourceId = i;
-    //    }
-    //}
-
-    log.debug('Assign ' + creep.name + ' to source: ' + sourceId);
-    creep.assignSource(sourceId);
-    this.memory.assignedCreeps++;
+    log.debug('Assign ' + creep.name + ' to source: ' + routes[sourceId].id);
+    creep.assignSource(routes[sourceId]);
 }
 
 function determineConstruction(spawn) {
@@ -153,6 +140,8 @@ function determineConstruction(spawn) {
 
 function buildEnergyWorker(spawn) {
     var name = spawn.name + 'Harvester' + spawn.memory.energyRoutes.reduce(function (prev, curr, index, array) {
+            log.debug('prev: ' + JSON.stringify(prev));
+            log.debug('curr: ' + + JSON.stringify(curr));
             return prev + curr.workers.length;
         }, 0);
 
