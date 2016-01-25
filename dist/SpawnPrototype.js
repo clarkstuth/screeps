@@ -1,43 +1,6 @@
-/*
- * Module code goes here. Use 'module.exports' to export things:
- * module.exports = 'a thing';
- *
- * You can import it from another modules like this:
- * var mod = require('SpawnUtil'); // -> 'a thing'
- */
-var util = require('Util');
-var creepUtil = require('CreepUtil');
-var energyRoute = require('EnergyRoute');
+var log = require('Logger').createLogger('Spawn');
 
-var log = require('Logger').createLogger('SpawnUtil');
-
-var GOALS = {
-    GATHER_ENERGY: "gather energy"
-};
-
-var STATES = {
-    BUILD_ENERGY_WORKER: "build energy worker"
-};
-
-module.exports.loop = function () {
-
-    log.debug('Start Loop');
-
-    for (var spawn in Game.spawns) {
-        spawn = Game.spawns[spawn];
-
-        spawn.act();
-    }
-
-    log.debug('End Loop');
-};
-
-Spawn.prototype.addNewEnergyRoute = function () {
-    var source = this.pos.findClosestByPath(FIND_SOURCES);
-    console.log(source);
-    this.memory.energyRoutes[source.id] = [];
-    return source;
-};
+var creepService = require('CreepService');
 
 Spawn.prototype.act = function () {
     log.debug(this.name + ' acting');
@@ -46,13 +9,12 @@ Spawn.prototype.act = function () {
     determineNextAction(this);
     assignUnassignedCreeps(this);
     determineConstruction(this);
-
 };
 
 function determineNextAction(spawn) {
     log.debug(spawn.name + ' determining next action.');
-    initialize(spawn);
 }
+
 
 function assignUnassignedCreeps(spawn) {
 
@@ -66,39 +28,15 @@ function assignUnassignedCreeps(spawn) {
         var creep = Game.creeps[creepName];
         assignCreep(spawn, creep);
     }
-    log.debug(spawn.name + ' no more creeps to assign.');
-}
-
-function initialize(spawn) {
-    util.setNewMemory(spawn, 'goal', GOALS.GATHER_ENERGY);
-    util.setNewMemory(spawn, 'state', STATES.BUILD_ENERGY_WORKER);
-    util.setNewMemory(spawn, 'stateTickCount', 0);
-    // energy routes is sourceId -> [workerIds]
-    util.setNewMemory(spawn, 'unassignedCreeps', []);
-
-    if (util.setNewMemory(spawn, 'energyRoutes', [])) {
-        log.debug(spawn.name + ' initializing energy routes');
-        var spawnPos = spawn.pos;
-
-        var sources = spawn.room.find(FIND_SOURCES);
-        for (var i in sources) {
-            var dist = spawnPos.findPathTo(sources[i]).length;
-            spawn.memory.energyRoutes[dist] = new energyRoute.create(sources[i].id);
-        }
-    }
-
-    return spawn;
 }
 
 function assignCreep(spawn, creep) {
     switch (creep.memory.job) {
 
         case creepUtil.jobs.HARVESTER:
-
             if (assignCreepToEnergy(creep, spawn.memory.energyRoutes))
                 break;
 
-            break;
         default:
             log.warn('No job assigned for ' + creep.name);
             return;

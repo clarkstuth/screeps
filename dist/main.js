@@ -1,7 +1,7 @@
 var log = require('Logger').createLogger('Main');
 
-var spawnUtil = require('SpawnUtil');
-var creepUtil = require('CreepUtil');
+var creepPrototype = require('CreepPrototype');
+var spawnPrototype = require('SpawnPrototype');
 
 var turn = 0;
 
@@ -13,4 +13,5 @@ module.exports.loop = function () {
     creepUtil.loop();
 
     log.debug('End');
+    log.debug('--------------------------------------');
 };
